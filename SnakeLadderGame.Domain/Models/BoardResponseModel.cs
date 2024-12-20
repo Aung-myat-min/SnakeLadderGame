@@ -9,7 +9,13 @@ namespace SnakeLadderGame.Domain.Models
 {
     public class BoardResponseModel
     {
-        public TblBoard? Board { get; set; }
-        public List<TblBoard>? LBoards { get; set; }
+        public BoardRouteResponseModel? Board { get; set; }
+        public List<BoardRouteResponseModel>? LBoards { get; set; }
+    }
+
+    public class BoardRouteResponseModel
+    {
+        public TblBoard? board { get; set; }
+        public List<TblBoardRoute>? routes { get; set; }
     }
 }
