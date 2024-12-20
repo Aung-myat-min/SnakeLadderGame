@@ -87,7 +87,7 @@ async Task InsertBoard()
     else
     {
         PrintResult.Print(response);
-        Console.WriteLine();  // Clear separation after printing result
+        Console.WriteLine(); 
     }
 }
 
@@ -103,6 +103,27 @@ async Task ViewBoards()
     else
     {
         PrintResult.Print(response);
-        Console.WriteLine();  // Clear separation after printing result
+        Console.WriteLine();
     }
+}
+
+async Task InsertRoute()
+{
+    Console.Write("Enter Board Id:" );
+    int boardId;
+    while (true)
+    {
+        try
+        {
+            boardId = int.Parse(Console.ReadLine()!);
+            break;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Invalid Input!");
+            continue;
+        }
+    }
+
+
 }

@@ -64,5 +64,29 @@ namespace SnakeLadderGame.Domain.Features
         Result:
             return response;
         }
+
+        public async Task<Result<BoardResponseModel>> GetBoard(int boardId)
+        {
+            var response = new Result<BoardResponseModel>();
+
+            var item = await _db.TblBoards.AsNoTracking().Where(b => b.BoardId == boardId).FirstOrDefaultAsync();
+
+            if (item is null)
+            {
+                response = Result<BoardResponseModel>.NotFound("No board found");
+                goto Result;
+            }
+
+            var board =  new BoardRouteResponseModel
+            {
+                board = item,
+                routes = _db.TblBoardRoutes.Where(r => r.BoardId == item.BoardId).ToList()
+            };
+
+            response = Result<BoardResponseModel>.Success("Here are the avaliable boards!", new BoardResponseModel { Board = board });
+
+        Result:
+            return response;
+        }
     }
 }
