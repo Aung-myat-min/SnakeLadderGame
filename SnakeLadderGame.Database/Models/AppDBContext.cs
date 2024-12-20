@@ -15,6 +15,15 @@ public partial class AppDBContext : DbContext
     {
     }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            string connectionString = "Server=Aung-Myat-Min\\SQL;Database=SnakeLadderGame;User Id=sa;Password=sasa@123;TrustServerCertificate=True;";
+            optionsBuilder.UseSqlServer(connectionString);
+        }
+    }
+
     public virtual DbSet<TblBoard> TblBoards { get; set; }
 
     public virtual DbSet<TblBoardRoute> TblBoardRoutes { get; set; }
@@ -22,10 +31,6 @@ public partial class AppDBContext : DbContext
     public virtual DbSet<TblGameRoom> TblGameRooms { get; set; }
 
     public virtual DbSet<TblPlayer> TblPlayers { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=Aung-Myat-Min\\SQL;Database=SnakeLadderGame;User Id=sa;Password=sasa@123;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

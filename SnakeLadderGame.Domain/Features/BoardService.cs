@@ -31,7 +31,11 @@ namespace SnakeLadderGame.Domain.Features
                 goto Result;
             }
 
-            response = Result<BoardResponseModel>.Success("Board created successfully", new BoardResponseModel { Board = newBoard });
+            var b = new BoardRouteResponseModel
+            {
+                board = newBoard
+            };
+            response = Result<BoardResponseModel>.Success("Board created successfully", new BoardResponseModel { Board = b });
 
         Result:
             return response;
@@ -55,7 +59,7 @@ namespace SnakeLadderGame.Domain.Features
                 routes = _db.TblBoardRoutes.Where(r => r.BoardId == l.BoardId).ToList()
             }).ToList();
 
-            response = Result<BoardResponseModel>.Success("Board created successfully", new BoardResponseModel { LBoards = boards });
+            response = Result<BoardResponseModel>.Success("Here are the avaliable boards!", new BoardResponseModel { LBoards = boards });
 
         Result:
             return response;

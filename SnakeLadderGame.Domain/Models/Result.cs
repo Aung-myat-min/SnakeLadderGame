@@ -17,7 +17,7 @@ namespace SnakeLadderGame.Domain.Models
         public bool IsNotFoundError { get { return Type == EnumResult.NotFound; } }
         public bool IsNormalError { get { return Type == EnumResult.Error; } }
         public bool IsValidationError { get { return Type == EnumResult.ValidationError; } }
-        public bool IsSErverError { get { return Type == EnumResult.ServerError; } }
+        public bool IsServerError { get { return Type == EnumResult.ServerError; } }
 
         public static Result<T> Success( string message, T? data)
         {
