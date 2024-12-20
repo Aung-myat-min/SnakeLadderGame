@@ -17,3 +17,11 @@ public partial class TblBoardRoute
 
     public virtual TblBoard Board { get; set; } = null!;
 }
+
+public enum EnumAcitonType
+{
+    None,
+    Normal,
+    Ladder,
+    Snake
+}
