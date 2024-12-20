@@ -11,7 +11,7 @@ namespace SnakeLadderGame.Domain.Features
 {
     public class BoardService
     {
-        private AppDBContext _db;
+        private readonly AppDBContext _db;
 
         public BoardService(AppDBContext db)
         {
