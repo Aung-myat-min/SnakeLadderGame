@@ -89,19 +89,25 @@ namespace SnakeLadderGame.Domain.Features
 
         public async Task<Result<PlayResponseModel>> Play(string roomCode)
         {
-            var respsonse = new Result<PlayResponseModel>();
+            var response = new Result<PlayResponseModel>();
             var actions = new List<string>();
 
             #region Check Game Room Avaliable or Ended
             var gameRoom = await _db.TblGameRooms.Where(r => r.RoomCode == roomCode).FirstOrDefaultAsync();
             if (gameRoom is null)
             {
-                respsonse = Result<PlayResponseModel>.NotFound("Game Room not found!");
+                response = Result<PlayResponseModel>.NotFound("Game Room not found!");
                 goto Result;
             }
             if (gameRoom.Winner != null)
             {
-                respsonse = Result<PlayResponseModel>.NotFound("Game Room is ended!");
+                var gameInfo = await GetGameInformation(roomCode);
+                if (gameInfo.IsError)
+                {
+                    response = Result<PlayResponseModel>.Error("Game Room is ended and no information found!");
+                    goto Result;
+                }
+                response = Result<PlayResponseModel>.NotFound("Game Room is ended!\n" + gameInfo.Data);
                 goto Result;
             }
             #endregion
@@ -116,7 +122,7 @@ namespace SnakeLadderGame.Domain.Features
             var player = await _db.TblPlayers.Where(p => p.RoomCode == roomCode && p.Turn == lastTurn).FirstOrDefaultAsync();
             if (player is null)
             {
-                respsonse = Result<PlayResponseModel>.NotFound("Player not found!");
+                response = Result<PlayResponseModel>.NotFound("Player not found!");
                 goto Result;
             }
             #endregion
@@ -139,7 +145,7 @@ namespace SnakeLadderGame.Domain.Features
                 var route = await _db.TblBoardRoutes.Where(r => r.BoardId == gameRoom.BoardId && r.Place == player.Position).FirstOrDefaultAsync();
                 if (route is null)
                 {
-                    respsonse = Result<PlayResponseModel>.NotFound("Route not found!");
+                    response = Result<PlayResponseModel>.NotFound("Route not found!");
                     goto Result;
                 }
 
@@ -162,11 +168,41 @@ namespace SnakeLadderGame.Domain.Features
             {
                 gameRoom.Winner = player.PlayerId;
             }
+            #endregion
+
+            #region Update Player Position
+            player.Position = newPosition;
+            gameRoom.LastTurn++;
+            _db.Update(player);
+            _db.Update(gameRoom);
+
+            int result = await _db.SaveChangesAsync();
+            if (result == 0)
+            {
+                response = Result<PlayResponseModel>.Error("Failed to update player position!");
+                goto Result;
+            }
+
         #endregion
 
+            var gameInformations = await GetGameInformation(roomCode);
+            if (gameInformations.IsError)
+            {
+                response = Result<PlayResponseModel>.Error("Failed to get game information!");
+                goto Result;
+            }
+
+            var nextPlayerColor = await _db.TblPlayers.AsNoTracking().Where(p => p.Turn == gameRoom.LastTurn && p.RoomCode == gameRoom.RoomCode).Select(p => p.Color).FirstOrDefaultAsync();
+            var model = new PlayResponseModel
+            {
+                ActionsMade = actions,
+                Positions = gameInformations.Data,
+                NextTurn = $"Next Turn is {nextPlayerColor}"
+            };
+            response = Result<PlayResponseModel>.Success("Here is the result!", model);
 
         Result:
-            return respsonse;
+            return response;
         }
 
         public async Task<Result<string>> GetGameInformation(string roomCode)
