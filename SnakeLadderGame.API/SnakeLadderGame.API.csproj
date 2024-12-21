@@ -11,4 +11,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SnakeLadderGame.Database\SnakeLadderGame.Database.csproj" />
+    <ProjectReference Include="..\SnakeLadderGame.Domain\SnakeLadderGame.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
