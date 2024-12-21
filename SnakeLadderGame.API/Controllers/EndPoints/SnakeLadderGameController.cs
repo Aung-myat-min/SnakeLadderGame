@@ -16,7 +16,7 @@ namespace SnakeLadderGame.API.Controllers.EndPoints
             _roomService = roomService;
         }
 
-        [HttpPost("{players}")]
+        [HttpPost("")]
         public async Task<IActionResult> StartANewGame(GameStartReqModel players)
         {
             try

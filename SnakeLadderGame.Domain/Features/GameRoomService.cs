@@ -40,7 +40,7 @@ public class GameRoomService : IGameRoomService
             goto Result;
         }
 
-        var lastId = await _db.TblGameRooms.AsNoTracking().Select(r => r.GameId).LastOrDefaultAsync();
+        var lastId = await _db.TblGameRooms.AsNoTracking().OrderBy(r => r.GameId).Select(r => r.GameId).LastOrDefaultAsync();
         var roomCode = "R" + (lastId + 1).ToString("D4");
 
         var newRoom = new TblGameRoom
@@ -110,7 +110,7 @@ public class GameRoomService : IGameRoomService
                 response = Result<PlayResponseModel>.Error("Game Room is ended and no information found!");
                 goto Result;
             }
-            response = Result<PlayResponseModel>.NotFound("Game Room is ended!\n" + gameInfo.Data);
+            response = Result<PlayResponseModel>.NotFound("Game Room is ended! " + gameInfo.Data);
             goto Result;
         }
         #endregion
@@ -135,7 +135,7 @@ public class GameRoomService : IGameRoomService
         var winningPosition = board!.BoardDimension * board.BoardDimension;
 
         int? newPosition = player.Position + diceNumber;
-        actions.Add($"{player.Color} + has reached to {newPosition}");
+        actions.Add($"{player.Color} has reached to {newPosition}");
 
         if (newPosition > winningPosition)
         {
@@ -175,7 +175,14 @@ public class GameRoomService : IGameRoomService
 
         #region Update Player Position
         player.Position = newPosition;
-        gameRoom.LastTurn++;
+        if(gameRoom.LastTurn == gameRoom.PlayerNumbers)
+        {
+            gameRoom.LastTurn = 1;
+        }
+        else
+        {
+            gameRoom.LastTurn++;
+        }
         _db.Update(player);
         _db.Update(gameRoom);
 
@@ -221,12 +228,13 @@ public class GameRoomService : IGameRoomService
 
         var players = await _db.TblPlayers.AsNoTracking().Where(p => p.RoomCode == roomCode).OrderByDescending(p => p.Position).ToListAsync();
 
-        string gameInformation = $"In Room: {roomCode}\n";
+        string gameInformation = $"In Room: {roomCode}, ";
         foreach (var player in players)
         {
-            gameInformation += $"Player {player.Color} is at {player.Position}\n";
+            gameInformation += $"Player {player.Color} is at {player.Position}, ";
         }
 
+        response =  Result<string>.Success( "Game Information: ", gameInformation);
     Result:
         return response;
     }
